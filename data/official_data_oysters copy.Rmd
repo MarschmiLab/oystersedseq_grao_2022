@@ -27,16 +27,35 @@ sediment_data <- read.csv("updated_oip copy.csv", stringsAsFactors = TRUE)
 
 ### plot data
 ```{r}
-dnaconc <- ggplot(data = sediment_data, mapping = aes(x = Location, y = DNA.Concentration.ng.uL)) + geom_jitter(mapping = aes(color=Treatment, shape = Treatment)) + geom_point(mapping = aes(color=Treatment, shape = Treatment)) + scale_color_manual(values = c("lightskyblue2", "plum3")) + geom_boxplot(alpha = 0.3, mapping = aes(color=Treatment)) + labs(
+dnaconc <- ggplot(data = sediment_data, mapping = aes(x = Location, y = DNA.Concentration.ng.uL)) + geom_point(mapping = aes(color=Treatment, shape = Treatment), position = position_jitterdodge()) + scale_color_manual(values = c("lightskyblue2", "plum3")) + geom_boxplot(alpha = 0.3, mapping = aes(color=Treatment), outlier.shape =  NA) + labs(
   x = "Location",
   y = "DNA Concentration (ng/uL)",
-  title = "Figure 1: DNA Concentration in Oyster and Bare Sediment Samples",
+  title = "DNA Concentration in Oyster and Bare Sediment Samples Across Locations",
   color = "Treatment"
 ) + theme(plot.title=element_text(hjust=0.5), panel.background = element_rect(fill = "ivory2"), text = element_text(family = "Times New Roman", size=12))
 
 dnaconc
 
 #axis.text.x = element_text(angle = 90, hjust = 1)
-ggsave(filename = "DNAConcentration.png", plot = dnaconc, width = 20, height = 12, dpi = 300, units = "cm")
+ggsave(filename = "DNAConcentration.png", plot = dnaconc, width = 22, height = 12, dpi = 300, units = "cm")
+```
+
+#### plot data - merging all oyster and bare sediment data
+```{r}
+dnaOB <- ggplot(data = sediment_data, mapping = aes(x = Treatment, y = DNA.Concentration.ng.uL)) + geom_point(mapping = aes(color=Treatment, shape = Treatment), position = position_jitterdodge()) + scale_color_manual(values = c("lightskyblue2", "plum3")) + geom_boxplot(alpha = 0.3, mapping = aes(color=Treatment), outlier.shape = NA) + labs(
+  x = "Sediment Type",
+  y = "DNA Concentration (ng/uL)",
+  title = "DNA Concentration Comparison Between Bare and Oyster Sediments",
+  color = "Treatment"
+) + theme(plot.title=element_text(hjust=0.5), panel.background = element_rect(fill = "ivory2"), text = element_text(family = "Times New Roman", size=12))
+
+dnaOB
+
+#ggsave(filename = "DNAConcOB.png", plot = dnaOB, width = 20, height = 15, dpi = 300, units = "cm")
+```
+
+##### plotting data - 
+```{r}
+
 ```
 
