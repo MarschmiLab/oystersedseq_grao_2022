@@ -8,11 +8,15 @@ output: html_document
 ```{r}
 library("tidyr")
 library("dplyr")
+library("ggplot2")
+library("extrafont")
+font_import()
+loadfonts(device = "all")
 ```
 
 ## Read data
 ```{r}
-official_data <- read.csv("updated_oip.csv", stringsAsFactors = TRUE)
+sediment_data <- read.csv("updated_oip copy.csv", stringsAsFactors = TRUE)
 #seasons according to the northern hemisphere:
   #spring: March 1 - May 31
   #summer: June 1 - August 31
@@ -20,3 +24,19 @@ official_data <- read.csv("updated_oip.csv", stringsAsFactors = TRUE)
   #winter: December 1 - February 28/29 
   #https://www.timeanddate.com/calendar/aboutseasons.html
 ```
+
+### plot data
+```{r}
+dnaconc <- ggplot(data = sediment_data, mapping = aes(x = Location, y = DNA.Concentration.ng.uL)) + geom_jitter(mapping = aes(color=Treatment, shape = Treatment)) + geom_point(mapping = aes(color=Treatment, shape = Treatment)) + scale_color_manual(values = c("lightskyblue2", "plum3")) + geom_boxplot(alpha = 0.3, mapping = aes(color=Treatment)) + labs(
+  x = "Location",
+  y = "DNA Concentration (ng/uL)",
+  title = "Figure 1: DNA Concentration in Oyster and Bare Sediment Samples",
+  color = "Treatment"
+) + theme(plot.title=element_text(hjust=0.5), panel.background = element_rect(fill = "ivory2"), text = element_text(family = "Times New Roman", size=12))
+
+dnaconc
+
+#axis.text.x = element_text(angle = 90, hjust = 1)
+ggsave(filename = "DNAConcentration.png", plot = dnaconc, width = 20, height = 12, dpi = 300, units = "cm")
+```
+
