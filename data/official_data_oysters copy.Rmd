@@ -10,7 +10,7 @@ library("tidyr")
 library("dplyr")
 library("ggplot2")
 library("extrafont")
-font_import()
+#font_import()
 loadfonts(device = "all")
 ```
 
@@ -25,37 +25,134 @@ sediment_data <- read.csv("updated_oip copy.csv", stringsAsFactors = TRUE)
   #https://www.timeanddate.com/calendar/aboutseasons.html
 ```
 
-### plot data
+# Normalized Data column
 ```{r}
-dnaconc <- ggplot(data = sediment_data, mapping = aes(x = Location, y = DNA.Concentration.ng.uL)) + geom_point(mapping = aes(color=Treatment, shape = Treatment), position = position_jitterdodge()) + scale_color_manual(values = c("lightskyblue2", "plum3")) + geom_boxplot(alpha = 0.3, mapping = aes(color=Treatment), outlier.shape =  NA) + labs(
+
+## add to an object so that data frame updates
+#change grams to 
+  #micrograms = 1000000
+  #nanograms = 1000000000
+  #microliters = 
+#sediment_data %>%
+ # select(DNA.Concentration.ng.uL, Elution.uL, Soil.mass.ext_grams) %>%
+ # mutate(
+    #DNA <- sediment_data$DNA.Concentration.ng.uL,
+    #mass <- (sediment_data$Soil.mass.ext_grams * 1000000),
+    #elution <- sediment_data$Elution.uL,
+  #  NormalizedData <- (sediment_data$DNA.Concentration.ng.uL) * (sediment_data$Elution.uL) * (1/(sediment_data$Soil.mass.ext_grams))
+#  )
+  
+sediment_data_new <- mutate(
+  sediment_data, Normalized.Values = sediment_data$DNA.Concentration.ng.uL * sediment_data$Elution.uL * (1/sediment_data$Soil.mass.ext_grams)
+)       
+
+print(sediment_data_new)
+
+#normalizeData
+```
+
+### plot data - normalized
+```{r}
+dnaconc <- ggplot(data = sediment_data_new, mapping = aes(x = Location, y = Normalized.Values)) + geom_point(mapping = aes(color=Treatment, shape = Treatment), position = position_jitterdodge()) + scale_color_manual(values = c("lightskyblue2", "plum3")) + geom_boxplot(alpha = 0.3, mapping = aes(color=Treatment), outlier.shape =  NA)  + labs(
   x = "Location",
-  y = "DNA Concentration (ng/uL)",
+  y = "DNA Concentration (ng DNA / g sediment)",
   title = "DNA Concentration in Oyster and Bare Sediment Samples Across Locations",
   color = "Treatment"
 ) + theme(plot.title=element_text(hjust=0.5), panel.background = element_rect(fill = "ivory2"), text = element_text(family = "Times New Roman", size=12))
 
 dnaconc
 
+#+ scale_y_continuous(breaks = seq(from=0, to= 40, by= 5), labels = seq(from=0, to=40, by=5))
 #axis.text.x = element_text(angle = 90, hjust = 1)
-ggsave(filename = "DNAConcentration.png", plot = dnaconc, width = 22, height = 12, dpi = 300, units = "cm")
+
+#wilcox test
+#require(graphics)
+#x = sediment_data_new$Normalized.Values
+#y = sediment_data_new$Normalized.Values
+#wilcox.test(x,y, paired = TRUE, alternative = "g")
+#wilcox.test(y, x, alternative = "greater", exact = FALSE, correct = FALSE)
+#wilcox.test(rnorm(10), rnorm(10, 2), conf.int = TRUE)
+
+#t-test
+#require(graphics)
+#x=sediment_data_new$Normalized.Values
+#t.test(x, y=NULL, alternative = "g", mu=0, paired = FALSE, var.equal = FALSE, conf.level = 0.95)
+
+#ggsave(filename = "DNAConcentrationNormalized.png", plot = dnaconc, width = 22, height = 14, dpi = 300, units = "cm")
 ```
 
-#### plot data - merging all oyster and bare sediment data
+### t-test for first plot
 ```{r}
-dnaOB <- ggplot(data = sediment_data, mapping = aes(x = Treatment, y = DNA.Concentration.ng.uL)) + geom_point(mapping = aes(color=Treatment, shape = Treatment), position = position_jitterdodge()) + scale_color_manual(values = c("lightskyblue2", "plum3")) + geom_boxplot(alpha = 0.3, mapping = aes(color=Treatment), outlier.shape = NA) + labs(
+
+t.test(data = OBaov, OBaov$Normalized.Data.1, OBaov$Normalized.Data.2, paired = TRUE)
+
+```
+
+
+#### plot data - merging all oyster and bare sediment data - normalized
+```{r}
+dnaOB <- ggplot(data = sediment_data_new, mapping = aes(x = Treatment, y = Normalized.Values)) + geom_point(mapping = aes(color=Treatment, shape = Treatment), position = position_jitterdodge()) + scale_color_manual(values = c("lightskyblue2", "plum3")) + geom_boxplot(alpha = 0.3, mapping = aes(color=Treatment), outlier.shape = NA)  + labs(
   x = "Sediment Type",
-  y = "DNA Concentration (ng/uL)",
+  y = "DNA Concentration (ng DNA / g sediment)",
   title = "DNA Concentration Comparison Between Bare and Oyster Sediments",
   color = "Treatment"
 ) + theme(plot.title=element_text(hjust=0.5), panel.background = element_rect(fill = "ivory2"), text = element_text(family = "Times New Roman", size=12))
 
 dnaOB
 
-#ggsave(filename = "DNAConcOB.png", plot = dnaOB, width = 20, height = 15, dpi = 300, units = "cm")
+#+ scale_y_continuous(breaks = seq(from=0, to= 40, by= 5), labels = seq(from=0, to=40, by=5))
+#ggsave(filename = "DNAConcOB.Normalized.png", plot = dnaOB, width = 20, height = 15, dpi = 300, units = "cm")
 ```
-
-##### plotting data - 
+# anova for the second plot
 ```{r}
+#library(ggplot2)
+#library(ggpubr)
+#library(tidyverse)
+#library(broom)
+#library(AICcmodavg)
+
+#summary(sediment_data_new)
+#OBaov <- read.csv("aovOB.csv", stringsAsFactors = TRUE)
+#one.way <- aov(Normalized.Data.1 ~ Normalized.Data.2, data = OBaov)
+#summary(one.way)
+```
+### kruskal wallis for the second plot
+```{r}
+kruskal.test(Treatment ~ Normalized.Values, data = sediment_data_new)
 
 ```
+
+
+###### plotting data
+```{r}
+OBplace <- ggplot(data = sediment_data, mapping = aes(x = Treatment, y = DNA.Concentration.ng.uL)) + geom_point(mapping = aes(color = Treatment, shape = Location), position = position_jitterdodge()) + scale_color_manual(values = c("lightskyblue2", "plum3")) + geom_boxplot(alpha = 0.3, mapping = aes(color=Treatment), outlier.shape = NA) + scale_y_continuous(breaks = seq(from=0, to= 40, by= 5), labels = seq(from=0, to=40, by=5)) + labs(
+  x = "Sediment Type",
+  y = "DNA Concentration (ng/uL)",
+  title = "Comparison Between Oyster and Bare Sediment DNA Conectration Across Locations",
+  color = "Treatment"
+) + theme(plot.title=element_text(hjust=0.5), panel.background = element_rect(fill = "ivory2"), text = element_text(family = "Times New Roman", size=10))
+
+OBplace
+```
+
+## plotting data without TP - normalized
+```{r}
+#having problems
+biomass <- ggplot(data = sediment_data_new, mapping = aes(x = Location, y = Normalized.Values)) + geom_point(mapping = aes(color=Treatment, shape = Treatment), position = position_jitterdodge()) + scale_color_manual(values = c("lightskyblue2", "plum3")) + geom_boxplot(alpha = 0.3, mapping = aes(color=Treatment)) + labs(
+  x = "Location",
+  y = "DNA Concentration (ng DNA / g sediment)",
+  title = "DNA Concentration in Oyster and Bare Sediment Samples Across Locations (no TP)",
+  color = "Treatment"
+) + theme(plot.title=element_text(hjust=0.5), panel.background = element_rect(fill = "ivory2"), text = element_text(family = "Times New Roman", size=12))
+
+biomass
+#filter(sediment_data_new, Location == c('Duxbury Bay', 'Ninigret Pond', 'RWU', 'Saltbox'))
+#filter(sediment_data_new$Location == "Town Pond")
+#filter(sediment_data_new, Location == "Town Pond")
+#filter(sediment_data_new, Location == "Duxbury Bay")
+#filter(sediment_data_new, Location == "Ninigret Pond")
+#filter(sediment_data_new, Location == "Saltbox")
+#filter(sediment_data_new, Location == "RWU")
+```
+
 

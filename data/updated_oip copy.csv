@@ -1,4 +1,4 @@
-Collection Date,Net Incubation Date,Isotope Incubation Date,Location,Lat,Long,Season,Treatment,Sample ID,Soil mass.ext_grams,Elution.mL,DNA Concentration.ng/uL
+Collection Date,Net Incubation Date,Isotope Incubation Date,Location,Lat,Long,Season,Treatment,Sample ID,Soil mass.ext_grams,Elution.uL,DNA Concentration.ng/uL
 6/18/18,6/19/18,6/20/18,Duxbury Bay,42.02252,-70.64671,Summer,Oyster,DB_20180618_O1,0.22,75,16.4
 6/18/18,6/19/18,6/20/18,Duxbury Bay,42.02252,-70.64671,Summer,Oyster,DB_20180618_O2,0.16,75,12.4
 6/18/18,6/19/18,6/20/18,Duxbury Bay,42.02252,-70.64671,Summer,Bare,DB_20180618_B1,0.18,75,4.28
