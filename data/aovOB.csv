@@ -1,4 +1,4 @@
-Treatment,Sample ID,Soil mass.ext_grams,Elution.uL,DNA Concentration.ng/uL,Normalized Data 1,,Treatment,Sample ID,Soil mass.ext_grams,Elution.uL,DNA Concentration.ng/uL,Normalized Data 2
+Treatment,Sample ID,Soil mass.ext_grams,Elution.uL,DNA Concentration.ng/uL,Normalized Data O,,Treatment,Sample ID,Soil mass.ext_grams,Elution.uL,DNA Concentration.ng/uL,Normalized Data B
 Oyster,DB_20180618_O1,0.22,75,16.4,5590.9091,,Bare,DB_20180618_B1,0.18,75,4.28,1783.3333
 Oyster,DB_20180618_O2,0.16,75,12.4,5812.5,,Bare,DB_20180618_B2,0.23,75,3.95,1288.0435
 Oyster,DB_20180818_O1,0.2,75,15.4,5775,,Bare,DB_20180818_B1,0.17,75,4.56,2011.7647
