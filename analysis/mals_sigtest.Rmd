@@ -1,0 +1,282 @@
+---
+title: "official updated data with new sample names"
+author: "Gabriela R Acevedo Oquendo"
+date: '2022-06-30'
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+#Load libraries
+```{r}
+library("tidyr")
+library("dplyr")
+library("ggplot2")
+library("extrafont")
+#font_import()
+loadfonts(device = "all")
+library("ggpubr")
+library("ggsignif")
+library("colorspace")
+```
+
+## Read data
+```{r}
+sediment_data <- read.csv("../data/updated_oip copy.csv", stringsAsFactors = TRUE)
+#seasons according to the northern hemisphere:
+  #spring: March 1 - May 31
+  #summer: June 1 - August 31
+  #fall: September 1 - November 30
+  #winter: December 1 - February 28/29 
+  #https://www.timeanddate.com/calendar/aboutseasons.html
+```
+
+# Normalized Data column
+```{r}
+
+## add to an object so that data frame updates
+#change grams to 
+  #micrograms = 1000000
+  #nanograms = 1000000000
+  #microliters = 
+#sediment_data %>%
+ # select(DNA.Concentration.ng.uL, Elution.uL, Soil.mass.ext_grams) %>%
+ # mutate(
+    #DNA <- sediment_data$DNA.Concentration.ng.uL,
+    #mass <- (sediment_data$Soil.mass.ext_grams * 1000000),
+    #elution <- sediment_data$Elution.uL,
+  #  NormalizedData <- (sediment_data$DNA.Concentration.ng.uL) * (sediment_data$Elution.uL) * (1/(sediment_data$Soil.mass.ext_grams))
+#  )
+  
+sediment_data_new <- mutate(
+  sediment_data, Normalized.Values = sediment_data$DNA.Concentration.ng.uL * sediment_data$Elution.uL * (1/sediment_data$Soil.mass.ext_grams)
+)       
+
+print(sediment_data_new)
+
+#normalizeData
+```
+
+### plot data - normalized
+```{r}
+
+compare_means(Normalized.Values ~ Location, data = sediment_data_new, method = "kruskal.test", p.adjust.methods = "bonferroni" )
+
+
+dnaconc <- ggplot(data = sediment_data_new, mapping = aes(x = Location, y = Normalized.Values)) + 
+  geom_point(mapping = aes(color = Treatment), size = 4, position = position_jitterdodge())+
+  geom_boxplot(alpha = 0.4, color = "powderblue", size = 1, outlier.shape =  NA)+
+  scale_color_manual(values = c("orchid4", "orchid4"))+ 
+  stat_compare_means(method = "kruskal.test", p.adjust.methods="bonferroni" , label.y = 19000) + 
+  geom_signif(comparisons = list(c("Duxbury Bay", "Ninigret Pond")), map_signif_level=TRUE, y_position = 12000)+ 
+  geom_signif(comparisons = list(c("Ninigret Pond", "RWU")), map_signif_level=TRUE, y_position = 15000)+ 
+  geom_signif(comparisons = list(c("RWU", "Saltbox")), map_signif_level=TRUE, y_position = 11000)+
+  geom_signif(comparisons = list(c("Town Pond", "Duxbury Bay")), map_signif_level=TRUE, y_position = 17000)+
+  geom_signif(comparisons = list(c("Saltbox", "Town Pond")), map_signif_level=TRUE, y_position = 13000)+ 
+  labs(
+    x = "Location",
+    y = "DNA Concentration (ng DNA / g sediment)",
+    title = "DNA Concentration in Oyster and Bare Sediment Samples Across Locations",
+    color = "Treatment"
+) + theme(plot.title=element_text(hjust=0.5), legend.position = "none",  panel.background = element_rect(fill = "ivory2"), text = element_text(family = "Times New Roman", size=16))
+
+#t.test(sediment_data_new$Location, sediment_data_new$Normalized.Values)
+#dnaconc + stat_compare_means(method = "t.test")
+dnaconc
+
+
+
+#+ scale_y_continuous(breaks = seq(from=0, to= 40, by= 5), labels = seq(from=0, to=40, by=5))
+#axis.text.x = element_text(angle = 90, hjust = 1)
+#stat_compare_means(method = "t.test") +
+
+
+
+#mapping = aes(color=Treatment, shape = Treatment)
+ #scale_color_manual(values = c("lightskyblue2", "plum3"))
+#map_signif_level=TRUE)
+#geom_signif(comparisons = list(c("Town Pond", "Duxbury Bay")), map_signif_level=TRUE, y_position = 15000)+
+#geom_signif(comparisons = list(c("Saltbox", "Town Pond")), map_signif_level=TRUE, y_position = 12000)+ 
+#ggsave(filename = "DNAConcentrationNormalizedBonf.png", plot = dnaconc, width = 25, height = 16, dpi = 300, units = "cm")
+```
+
+#### plot data - merging all oyster and bare sediment data - normalized
+```{r}
+
+#compare_means( Normalized.Values ~ Treatment, data = sediment_data_new, method = "wilcox.test")
+compare_means( Normalized.Values ~ Treatment, data = sediment_data_new, method = "t.test")
+
+
+
+dnaOB <- ggplot(data = sediment_data_new, mapping = aes(x = Treatment, y = Normalized.Values)) +
+  geom_point(mapping = aes(color=Treatment, shape = Treatment), position = position_jitterdodge()) +
+  scale_color_manual(values = c("darkseagreen3", "lightsalmon")) + 
+  stat_compare_means(method = "t.test", label.y = 25000) + 
+  geom_signif(comparisons = list(c("Oyster", "Bare")), map_signif_level=TRUE) +
+  geom_boxplot(alpha = 0.3, mapping = aes(color=Treatment), outlier.shape = NA) + 
+  labs(
+  x = "Sediment Type",
+  y = "DNA Concentration (ng DNA / g sediment)",
+  title = "DNA Concentration Comparison Between Bare and Oyster Sediments",
+  color = "Treatment"
+) +
+  theme(plot.title=element_text(hjust=0.5), panel.background = element_rect(fill = "ivory2"), text = element_text(family = "Times New Roman", size=12)) 
+
+#kruskal_test <- kruskal.test(Treatment ~ Normalized.Values, data = sediment_data_new)
+
+
+dnaOB
+
+#+ scale_y_continuous(breaks = seq(from=0, to= 40, by= 5), labels = seq(from=0, to=40, by=5))
+#ggsave(filename = "DNAConcOB.Normalized_w_TP.png", plot = dnaOB, width = 20, height = 15, dpi = 300, units = "cm")
+```
+```{r OvsB-withoutTP}
+
+sediment_data_new_noTP <- 
+  sediment_data_new %>%
+  dplyr::filter(Location != "Town Pond")
+
+compare_means(Normalized.Values ~ Treatment, data = sediment_data_new_noTP, method = "wilcox.test", paired = TRUE)
+
+
+dnaOB_no_TP <- ggplot(data =  sediment_data_new_noTP, mapping = aes(x = Treatment, y = Normalized.Values)) +
+  geom_point(mapping = aes(color=Treatment, shape = Treatment), size=4, position = position_jitterdodge()) +
+  scale_color_manual(values = c("darkseagreen3", "lightsalmon")) + 
+  stat_compare_means(method = "wilcox.test", paired = TRUE, label.y = 15000) + 
+  geom_signif(comparisons = list(c("Oyster", "Bare")), map_signif_level=TRUE, y_position = 12000) +
+  geom_boxplot(alpha = 0.3, mapping = aes(color=Treatment), size = 1, outlier.shape = NA) + 
+  labs(
+  x = "Sediment Type",
+  y = "DNA Concentration (ng DNA / g sediment)",
+  title = "DNA Concentration Comparison Between Bare and Oyster Sediments",
+  color = "Treatment"
+) +
+  theme(plot.title=element_text(hjust=0.5), panel.background = element_rect(fill = "ivory2"), text = element_text(family = "Times New Roman", size=16)) 
+
+dnaOB_no_TP
+
+#ggsave(filename = "DNAConcOB.Normalized_no_TP_Bonf.png", plot = dnaOB_no_TP, width = 25, height = 16, dpi = 300, units = "cm")
+```
+
+
+
+
+
+# anova for the second plot
+```{r}
+#library(ggplot2)
+#library(ggpubr)
+#library(tidyverse)
+#library(broom)
+#library(AICcmodavg)
+
+#summary(sediment_data_new)
+#OBaov <- read.csv("aovOB.csv", stringsAsFactors = TRUE)
+#one.way <- aov(Normalized.Data.1 ~ Normalized.Data.2, data = OBaov)
+#summary(one.way)
+```
+### kruskal wallis for the second plot
+```{r}
+kruskal.test(Treatment ~ Normalized.Values, data = sediment_data_new)
+
+```
+
+### t-test for second plot
+```{r}
+t_test <- read.csv("aovOB.csv", stringsAsFactors = TRUE)
+t.test(data = t_test, t_test$Normalized.Data.O, t_test$Normalized.Data.B, paired = FALSE)
+
+```
+
+## plotting data without TP - normalized
+```{r}
+sediment_data_new_noTP <- 
+  sediment_data_new %>%
+  dplyr::filter(Location != "Town Pond")
+
+#compare_means(Normalized.Values ~ Location , data = sediment_data_new_noTP, method = "wilcox.test")
+
+#pairwise.wilcox.test(sediment_data_new_noTP$Normalized.Values, sediment_data_new_noTP$Location, p.adjust.method = "bonf")
+
+
+#pwwilcox <- pairwise.wilcox.test(sediment_data_new_noTP$Normalized.Values, sediment_data_new_noTP$Location, p.adjust.method = "bonferroni")
+#pwwilcox
+
+#stat_compare_means(method = "wilcox.test", p.adjust.methods = "bonferroni" , label.y = 18000)
+
+gnsd_no_tp <-
+  sediment_data_new_noTP %>%
+  ggplot(mapping = aes(x = Location, y = Normalized.Values)) + 
+  geom_point(mapping = aes(color=Treatment, shape = Treatment), size=3 , position = position_jitterdodge()) +
+  scale_color_manual(values = c("lightskyblue2", "plum3"))+ 
+  geom_boxplot(alpha = 0.3, mapping = aes(color=Treatment), outlier.shape = NA) +
+  stat_compare_means(method = "wilcox.test", 
+                     pairwise.wilcox.test(sediment_data_new_noTP$Normalized.Values,
+                                          sediment_data_new_noTP$Location, p.adjust.method = "bonferroni"), 
+                     label.y = 18000) +
+  labs(
+    x = "Location",
+    y = "DNA Concentration (ng DNA / g sediment)",
+    title = "DNA Concentration in Oyster and Bare Sediment Samples Across Locations (no TP)",
+    color = "Treatment"
+) + theme(plot.title=element_text(hjust=0.5), panel.background = element_rect(fill = "ivory2"), text = element_text(family = "Times New Roman", size=16))
+
+gnsd_no_tp
+#ggsave(filename = "DNAConcNoTPNormBonf.png", plot = nsd_no_tp, width = 22, height = 14, dpi = 300, units = "cm")
+#biomass
+# geom_signif(comparisons = list(c("Oyster", "Bare")), map_signif_level  =  TRUE) - significance stars
+```
+
+
+# Figure 3
+
+```{r}
+# Marian plot 
+sediment_data_new_noTP %>%
+  ggplot(aes(x = Location, y = Normalized.Values, 
+             color = Treatment, fill = Treatment)) +
+  facet_grid(~Location, scales = "free_x")+
+  geom_point(size=3 , position = position_jitterdodge(jitter.width = 0.25)) +
+  geom_boxplot(alpha = 0.3, outlier.shape = NA) +
+  scale_color_manual(values = c("lightskyblue2", "plum3")) +
+  scale_fill_manual(values = c("lightskyblue2", "plum3")) +
+  labs(
+    x = "Location",
+    y = "DNA Concentration (ng DNA / g sediment)",
+    title = "[DNA] in Oyster and Bare Sediment Samples Across Locations") + 
+  # Add the statistical test with an unpaired w
+  stat_compare_means(paired = FALSE, method = "wilcox.test",label.y = 11000, 
+                     aes(label = paste0("p = ", ..p.format..), )) +
+  theme(plot.title=element_text(hjust=0.5), 
+        # remove facet labels
+        strip.background = element_blank(),strip.text.x = element_blank(),
+        panel.background = element_rect(fill = "ivory2"), 
+        text = element_text(family = "Times New Roman", size=16))
+
+ggsave(filename = "figures/OvsB_location.png", width = 22, height = 14, dpi = 300, units = "cm")
+```
+
+
+
+###wilcoxon test for final plot - no TP
+```{r}
+
+
+wilcox_test_df <- read.csv("data/aovOB.csv", stringsAsFactors = TRUE)
+
+
+wilcox_testDB <- wilcox.test(data = wilcox_test_df, Location = "Duxbury Bay", wilcox_test_df$Normalized.Data.O, wilcox_test_df$Normalized.Data.B, paired = FALSE)
+
+
+wilcox_testSB <- wilcox.test(Location = "Saltbox" ~ Normalized.Values, data = wilcox_test_df)
+wilcox_testRWU <- wilcox.test(Location = "RWU" ~ Normalized.Values, data = wilcox_test_df)
+wilcox_testNP <- wilcox.test(Location = "Ninigret Pond" ~ Normalized.Values, data = wilcox_test_df)  
+
+#dplyr::filter(sediment_data_new, Location != "Town Pond")%>% 
+#compare_means(formula, data, method = "wilcox.test", paired = FALSE, group.by = NULL, ref.group = NULL)
+
+#stat_compare_means(mapping = NULL, comparisons = NULL, hide.ns = FALSE, label = NULL,  label.x = NULL, label.y = NULL)
+
+#compare_means(Normalized.Data)
+```
+
+
