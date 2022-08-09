@@ -62,19 +62,19 @@ compare_means(Normalized.Values ~ Location, data = sediment_data_new, method = "
 
 dnaconc <- ggplot(data = sediment_data_new, mapping = aes(x = Location, y = Normalized.Values)) + 
   geom_point(mapping = aes(color = Treatment), size = 4, position = position_jitterdodge())+
-  geom_boxplot(alpha = 0.4, color = "powderblue", size = 1, outlier.shape =  NA)+
-  scale_color_manual(values = c("orchid4", "orchid4"))+ 
-  stat_compare_means(method = "kruskal.test", p.adjust.methods="bonferroni" , label.y = 19000) + 
-  geom_signif(comparisons = list(c("Duxbury Bay", "Ninigret Pond")), map_signif_level=TRUE, y_position = 12000)+ 
-  geom_signif(comparisons = list(c("Ninigret Pond", "RWU")), map_signif_level=TRUE, y_position = 15000)+ 
-  geom_signif(comparisons = list(c("RWU", "Saltbox")), map_signif_level=TRUE, y_position = 11000)+
-  geom_signif(comparisons = list(c("Town Pond", "Duxbury Bay")), map_signif_level=TRUE, y_position = 17000)+
-  geom_signif(comparisons = list(c("Saltbox", "Town Pond")), map_signif_level=TRUE, y_position = 13000)+ 
+  geom_boxplot(alpha = 0.4, color = "rosybrown1", size = 0.7, outlier.shape =  NA)+
+  scale_color_manual(values = c("rosybrown1", "rosybrown1"))+ 
+  stat_compare_means(method = "kruskal.test", p.adjust.methods="bonferroni" , label.y = 28000) + 
+  geom_signif(comparisons = list(c("Duxbury Bay", "Ninigret Pond")), map_signif_level=TRUE, y_position = 15000)+ 
+  geom_signif(comparisons = list(c("Ninigret Pond", "RWU")), map_signif_level=TRUE, y_position = 18000)+ 
+  geom_signif(comparisons = list(c("RWU", "Saltbox")), map_signif_level=TRUE, y_position = 15000)+
+  geom_signif(comparisons = list(c("Town Pond", "Duxbury Bay")), map_signif_level=TRUE, y_position = 25000)+
+  geom_signif(comparisons = list(c("Saltbox", "Town Pond")), map_signif_level=TRUE, y_position = 22000)+ 
   
   labs(
     x = "Location",
     y = "DNA Concentration (ng DNA / g sediment)",
-    title = "DNA Concentration in Oyster and Bare Sediment Samples Across Locations",
+    title = "DNA Concentration of Sediment Samples Across Locations",
     color = "Treatment"
 ) + theme(plot.title=element_text(hjust=0.5), legend.position = "none",  panel.background = element_rect(fill = "ivory2"), text = element_text(family = "Times New Roman", size=16))
 
@@ -95,7 +95,7 @@ dnaconc
 #map_signif_level=TRUE)
 #geom_signif(comparisons = list(c("Town Pond", "Duxbury Bay")), map_signif_level=TRUE, y_position = 15000)+
 #geom_signif(comparisons = list(c("Saltbox", "Town Pond")), map_signif_level=TRUE, y_position = 12000)+ 
-#ggsave(filename = "DNAConcentrationNormalizedBonf.png", plot = dnaconc, width = 25, height = 16, dpi = 300, units = "cm")
+ggsave(filename = "DNAConcentrationNormalizedBonf.png", plot = dnaconc, width = 25, height = 16, dpi = 300, units = "cm")
 ```
 
 
@@ -220,14 +220,14 @@ gnsd_no_tp <-
   labs(
     x = "Location",
     y = "DNA Concentration (ng DNA / g sediment)",
-    title = "DNA Concentration in Oyster and Bare Sediment Samples Across Locations (no TP)",
+    title = "DNA Concentration of Oyster and Bare Sediment Samples Across Locations",
     color = "Treatment"
 ) + 
   theme(plot.title=element_text(hjust=0.5), strip.background = element_blank(), strip.text.x = element_blank(), panel.background = element_rect(fill = "ivory2"), text = element_text(family = "Times New Roman", size=16)) 
 
 gnsd_no_tp
 
-#ggsave(filename = "DNAConcNoTPNormBonf.png", plot = nsd_no_tp, width = 22, height = 14, dpi = 300, units = "cm")
+ggsave(filename = "DNAConcNoTPNormBonf.png", plot = gnsd_no_tp, width = 26, height = 16, dpi = 300, units = "cm")
 #biomass
 # geom_signif(comparisons = list(c("Oyster", "Bare")), map_signif_level  =  TRUE) - significance stars
 ```
